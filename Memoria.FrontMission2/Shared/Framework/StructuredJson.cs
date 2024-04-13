@@ -42,36 +42,14 @@ public static class StructuredJson
 
         while (reader.TokenType != JsonToken.None && reader.TokenType != JsonToken.EndObject)
         {
+            TransifexEntry entry = new TransifexEntry();
             String key = ReadPropertyName(reader);
-            ReadStartObject(reader);
-            {
-                TransifexEntry entry = new TransifexEntry();
+            entry.Text = ReadString(reader);
 
-                while (reader.TokenType != JsonToken.EndObject)
-                {
-                    switch (ReadPropertyName(reader))
-                    {
-                        case "string":
-                            entry.Text = ReadString(reader);
-                            break;
-                        case "context":
-                            entry.Context = ReadString(reader);
-                            break;
-                        case "developer_comment":
-                            entry.Comment = ReadString(reader);
-                            break;
-                        case "character_limit":
-                            entry.CharacterLimit = ReadInt32(reader);
-                            break;
-                    }
-                }
-                ReadEndObject(reader);
+            if (entry.Text is null)
+                throw new NotSupportedException("if (entry.Text is null)");
 
-                if (entry.Text is null)
-                    throw new NotSupportedException("if (entry.Text is null)");
-
-                orderedDictionary.AddOrUpdate(key, entry);
-            }
+            orderedDictionary.AddOrUpdate(key, entry);
         }
 
         return orderedDictionary;
