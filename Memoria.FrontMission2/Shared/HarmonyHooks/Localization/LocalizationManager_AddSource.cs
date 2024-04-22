@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using HarmonyLib;
 using I2.Loc;
 using Memoria.FrontMission2.BeepInEx;
@@ -29,17 +30,8 @@ public static class LocalizationManager_AddSource
     {
         try
         {
-            AssetsConfiguration config = ModComponent.Instance.Config.Assets;
-            if (!config.ModsEnabled)
+            if (TryModify(Source))
                 return;
-
-            String assetsRoot = $"Localization/{LocalizationManager.CurrentLanguage}";
-            IReadOnlyList<String> files = ModComponent.Instance.ModFiles.FindAllStartedWith(assetsRoot);
-            if (files.Count == 0)
-                return;
-
-            Int32 languageIndex = Source.GetLanguageIndex(LocalizationManager.CurrentLanguage);
-            Modify(languageIndex, files, Source);
         }
         catch (Exception ex)
         {
@@ -47,7 +39,49 @@ public static class LocalizationManager_AddSource
         }
     }
 
-    private static void Modify(Int32 languageIndex, IReadOnlyList<String> files, LanguageSourceData sourceData)
+    public static void OnModsUpdated()
+    {
+        foreach (LanguageSourceData source in LocalizationManager.Sources)
+        {
+            if (source != null)
+                TryModify(source);
+        }
+
+        LocalizationManager.LocalizeAll(Force: true);
+        if (DialogueManager.Instance.IsDialogueShown)
+        {
+            FieldInfo sentenceIndexField = AccessTools.Field(typeof(DialogueManager), "sentenceIndex");
+            Int32 sentenceIndex = (Int32)sentenceIndexField.GetValue(DialogueManager.Instance);
+            if (sentenceIndex > -1)
+            {
+                // Repeat the last sentence
+                sentenceIndexField.SetValue(DialogueManager.Instance, value: sentenceIndex - 1);
+                
+                // Remove cached writer
+                AccessTools.Field(typeof(DialogueManager), "textWriter").SetValue(DialogueManager.Instance, value: null);
+
+                DialogueManager.Instance.DisplayNextSentence();
+            }
+        }
+    }
+
+    private static Boolean TryModify(LanguageSourceData source)
+    {
+        AssetsConfiguration config = ModComponent.Instance.Config.Assets;
+        if (!config.ModsEnabled)
+            return true;
+
+        String assetsRoot = $"Localization/{LocalizationManager.CurrentLanguage}";
+        IReadOnlyList<String> files = ModComponent.Instance.ModFiles.FindAllStartedWith(assetsRoot);
+        if (files.Count == 0)
+            return true;
+
+        Int32 languageIndex = source.GetLanguageIndex(LocalizationManager.CurrentLanguage);
+        ModifyInternal(languageIndex, files, source);
+        return false;
+    }
+
+    private static void ModifyInternal(Int32 languageIndex, IReadOnlyList<String> files, LanguageSourceData sourceData)
     {
         Dictionary<String, TransifexEntry> entries = new Dictionary<String, TransifexEntry>();
         Dictionary<String, TransifexEntry> tags = new Dictionary<String, TransifexEntry>();

@@ -6,6 +6,7 @@ using System.Threading;
 using I2.Loc;
 using Memoria.FrontMission2.Configuration;
 using Memoria.FrontMission2.Core;
+using Memoria.FrontMission2.HarmonyHooks;
 
 namespace Memoria.FrontMission2.Mods;
 
@@ -50,17 +51,18 @@ public sealed class ModFileResolver : SafeComponent
 
         return result;
     }
-    
+
     protected override void Update()
     {
         RefreshWatcher();
-        
+
         if (!TryRefreshCatalog())
             return;
 
-        // TalkGroup_GetNextCommand.RepeatLast = true;
-        String currentLanguage = LocalizationManager.CurrentLanguage;
-        LocalizationManager.SetLanguageAndCode(currentLanguage, LocalizationManager.GetLanguageCode(currentLanguage), Force: true);
+        LocalizationManager_AddSource.OnModsUpdated();
+        
+        // String currentLanguage = LocalizationManager.CurrentLanguage;
+        // LocalizationManager.SetLanguageAndCode(currentLanguage, LocalizationManager.GetLanguageCode(currentLanguage), Force: true);
     }
 
     private Boolean TryRefreshCatalog()
