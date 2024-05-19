@@ -12,8 +12,8 @@ public sealed class LocalizationControl : SafeComponent
     {
     }
 
-    private Hotkey OpenInBrowserShift { get; } = new(KeyCode.F4) { Shift = true };
-    private Hotkey OpenInBrowserControl { get; } = new(KeyCode.F4) { Control = true };
+    private Hotkey OpenInBrowserShift { get; } = new(KeyCode.F3) { Shift = true };
+    private Hotkey OpenInBrowserControl { get; } = new(KeyCode.F3) { Control = true };
 
     protected override void Update()
     {
