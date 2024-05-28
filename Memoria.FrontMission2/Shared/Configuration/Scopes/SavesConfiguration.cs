@@ -10,4 +10,5 @@ public abstract partial class SavesConfiguration
     public virtual Boolean BackupSaveFiles => false;
 
     public abstract void CopyFrom(SavesConfiguration configuration);
+    public abstract void OverrideFrom(SavesConfiguration configuration);
 }

@@ -39,6 +39,8 @@ public class EntryPoint : BaseUnityPlugin
         {
             Logger.LogInfo("[Harmony] Patching critical methods...");
             Harmony harmony = new Harmony(ModConstants.Id);
+            ConfigEntryBase_Ctor.Patch(harmony, Logger);
+            ConfigEntryBase_SetSerializedValue.Patch(harmony, Logger);
             ConfigDescription_Description.Patch(harmony, Logger);
         }
         catch (Exception ex)

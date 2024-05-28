@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using BepInEx.Logging;
 using I2.Loc;
 using Memoria.FrontMission2.Configuration;
 using Memoria.FrontMission2.Core;
@@ -24,6 +25,7 @@ public sealed class ModFileResolver : SafeComponent
     {
         _modsRoot = ModComponent.Instance.Config.Assets.ModsDirectory;
         _catalog = IndexMods(_modsRoot);
+        UpdateConfiguration();
     }
 
     public Int64 CurrentVersion => Interlocked.Read(ref _fileVersion);
@@ -59,6 +61,7 @@ public sealed class ModFileResolver : SafeComponent
         if (!TryRefreshCatalog())
             return;
 
+        UpdateConfiguration();
         LocalizationManager_AddSource.OnModsUpdated();
         
         // String currentLanguage = LocalizationManager.CurrentLanguage;
@@ -89,6 +92,18 @@ public sealed class ModFileResolver : SafeComponent
         }
 
         return true;
+    }
+
+    private void UpdateConfiguration()
+    {
+        const String directoryAddress = $@"BepInEx/config/{ModConstants.Id}";
+        String[] configDirectories = FindAllStartedWith(directoryAddress)
+            .Select(p => Path.GetDirectoryName(p).Replace("\\", "/"))
+            .Distinct(StringComparer.InvariantCultureIgnoreCase)
+            .Where(p => p.EndsWith(directoryAddress, StringComparison.InvariantCultureIgnoreCase))
+            .ToArray();
+            
+        ModComponent.Instance.Config.OverrideFrom(configDirectories);
     }
 
     private Dictionary<String, List<String>> GetActualCatalog()

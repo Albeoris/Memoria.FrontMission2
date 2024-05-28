@@ -10,4 +10,5 @@ public abstract partial class ArenaConfiguration
     public virtual Boolean DisableRepeatedBattles => false;
 
     public abstract void CopyFrom(ArenaConfiguration configuration);
+    public abstract void OverrideFrom(ArenaConfiguration configuration);
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using BepInEx.Configuration;
 
 namespace Memoria.FrontMission2.Configuration;
 

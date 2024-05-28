@@ -35,9 +35,6 @@ public sealed class ModComponent : MonoBehaviour
             SpeedControl = new GameSpeedControl();
             ModFiles = new ModFileResolver();
             Localization = new LocalizationControl();
-            // VideoControl = new GameVideoControl();
-            //
-            // ArenaWins = new ArenaWinsControl();
 
             Log.LogMessage($"[{nameof(ModComponent)}].{nameof(Awake)}(): Processed successfully.");
         }

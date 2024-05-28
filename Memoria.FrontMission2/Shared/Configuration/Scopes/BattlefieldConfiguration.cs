@@ -14,4 +14,5 @@ public abstract partial class BattlefieldConfiguration
     public virtual Boolean DisplayAttackRangeOnCell => true;
 
     public abstract void CopyFrom(BattlefieldConfiguration configuration);
+    public abstract void OverrideFrom(BattlefieldConfiguration configuration);
 }

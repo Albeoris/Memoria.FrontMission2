@@ -23,6 +23,7 @@ public abstract partial class SpeedConfiguration
     public virtual Single HoldFactor { get; } = 5.0f;
 
     public abstract void CopyFrom(SpeedConfiguration configuration);
+    public abstract void OverrideFrom(SpeedConfiguration configuration);
 
     protected IAcceptableValue<HotkeyGroup> KeyConverter { get; } = new AcceptableHotkeyGroup(nameof(Key), canHold: true);
 }

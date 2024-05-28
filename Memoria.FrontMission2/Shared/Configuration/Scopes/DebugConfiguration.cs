@@ -10,4 +10,5 @@ public abstract partial class DebugConfiguration
     public virtual Boolean EnableDebugMenu => false;
     
     public abstract void CopyFrom(DebugConfiguration configuration);
+    public abstract void OverrideFrom(DebugConfiguration configuration);
 }

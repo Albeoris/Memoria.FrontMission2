@@ -22,7 +22,7 @@ internal sealed class ConfigurationEntryDescriptor : IEquatable<ConfigurationEnt
     }
 
     public String BackingFieldName => $"_{Char.ToLower(Name[0], CultureInfo.InvariantCulture)}{Name.Substring(1)}";
-
+    public String OverrideName => $"Override{Name}";
 
     public override Boolean Equals(Object? obj)
     {

@@ -44,6 +44,7 @@ public abstract partial class AssetsConfiguration
     protected IAcceptableValue<String> ModsDirectoryConverter { get; } = new AcceptableDirectoryPath(nameof(ModsDirectory), create: true);
 
     public abstract void CopyFrom(AssetsConfiguration configuration);
+    public abstract void OverrideFrom(AssetsConfiguration configuration);
 
     // public String GetExportDirectoryIfEnabled() => ExportEnabled ? ExportDirectory : String.Empty;
     // public String GetImportDirectoryIfEnabled() => ImportEnabled ? ImportDirectory : String.Empty;
