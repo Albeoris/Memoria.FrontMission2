@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Reflection;
 using BepInEx;
-using BepInEx.Configuration;
-using BepInEx.Unity.Mono;
 using HarmonyLib;
 using Memoria.FrontMission2.Core;
 using Memoria.FrontMission2.HarmonyHooks;
+
+#if BepInEx6
+    using BepInEx.Unity.Mono;
+#endif
 
 namespace Memoria.FrontMission2;
 

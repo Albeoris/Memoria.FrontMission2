@@ -48,6 +48,10 @@
             <FrameworkPathOverride Condition="'$(GamePath.Contains(`FRONT MISSION 2 Remake Demo`))' == 'False'">$(GamePath)\Front Mission 2 Remake_Data\Managed</FrameworkPathOverride>
             <FrameworkPathOverride Condition="'$(GamePath.Contains(`FRONT MISSION 2 Remake Demo`))' == 'True'">$(GamePath)\Front Mission 2 Remake Demo_Data\Managed</FrameworkPathOverride>
         </PropertyGroup>
+		
+		<PropertyGroup Condition=" '$(Configuration)' == 'Steam' ">
+			<DefineConstants>$(DefineConstants);BepInEx6</DefineConstants>
+		</PropertyGroup>
         
         <Message Text="FrameworkPathOverride: $(FrameworkPathOverride)" Importance="high"/>
 
@@ -61,7 +65,7 @@
             <ProjectReference Include="..\Memoria.CodeGenerator\Memoria.CodeGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
         </ItemGroup>
 
-        <ItemGroup>
+        <ItemGroup Condition=" '$(Configuration)' == 'Steam' ">
             <Reference Include="0Harmony">
                 <HintPath>$(GamePath)\BepInEx\core\0Harmony.dll</HintPath>
                 <Private>False</Private>
@@ -76,6 +80,17 @@
             </Reference>
             <Reference Include="BepInEx.Unity.Common">
                 <HintPath>$(GamePath)\BepInEx\core\BepInEx.Unity.Common.dll</HintPath>
+                <Private>False</Private>
+            </Reference>
+        </ItemGroup>
+		
+        <ItemGroup Condition=" '$(Configuration)' == 'BepInEx5' ">
+            <Reference Include="0Harmony">
+                <HintPath>$(GamePath)\BepInEx5\core\0Harmony.dll</HintPath>
+                <Private>False</Private>
+            </Reference>
+            <Reference Include="BepInEx">
+                <HintPath>$(GamePath)\BepInEx5\core\BepInEx.dll</HintPath>
                 <Private>False</Private>
             </Reference>
         </ItemGroup>
