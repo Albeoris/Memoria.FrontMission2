@@ -17,6 +17,10 @@ public abstract partial class LocalizationConfiguration
                  "$[Russian]: Использовать имена героев вместо позывных.")]
     public virtual CallSignsFromNames UseCharacterNamesInsteadCallSigns => CallSignsFromNames.Disabled;
 
+    [ConfigEntry("Reduces the black outline of labels such as AP in combat to improve the appearance of Unicode characters." +
+                 "$[Russian]: Уменьшает чёрную обводку надписей, таких как AP в бою, для улучшения внешнего вида юникодных символов.")]
+    public virtual Boolean ReduceBlackOutlines => false;
+
     public abstract void CopyFrom(LocalizationConfiguration configuration);
     public abstract void OverrideFrom(LocalizationConfiguration configuration);
     

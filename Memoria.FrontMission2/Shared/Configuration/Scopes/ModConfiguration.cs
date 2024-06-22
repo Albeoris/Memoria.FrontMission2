@@ -11,6 +11,7 @@ public sealed partial class ModConfiguration
     public ArenaConfiguration Arena { get; }
     public BattlefieldConfiguration Battlefield { get; }
     public LocalizationConfiguration Localization { get; }
+    public CheatsConfiguration Cheats { get; }
     public DebugConfiguration Debug { get; }
 
     private readonly ConfigFileProvider _provider = new();
@@ -29,6 +30,7 @@ public sealed partial class ModConfiguration
                 Arena = ArenaConfiguration.Create(_provider);
                 Battlefield = BattlefieldConfiguration.Create(_provider);
                 Localization = LocalizationConfiguration.Create(_provider);
+                Cheats = CheatsConfiguration.Create(_provider);
                 Debug = DebugConfiguration.Create(_provider);
 
                 log.LogInfo($"{nameof(ModConfiguration)} initialized successfully.");

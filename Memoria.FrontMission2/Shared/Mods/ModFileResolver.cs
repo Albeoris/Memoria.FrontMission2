@@ -104,6 +104,7 @@ public sealed class ModFileResolver : SafeComponent
             .ToArray();
             
         ModComponent.Instance.Config.OverrideFrom(configDirectories);
+        GameDataHandler.CheatsEnabled = ModComponent.Instance.Config.Cheats.Enabled;
     }
 
     private Dictionary<String, List<String>> GetActualCatalog()
