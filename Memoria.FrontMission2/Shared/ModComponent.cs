@@ -18,6 +18,7 @@ public sealed class ModComponent : MonoBehaviour
     [field: NonSerialized] public GameSpeedControl SpeedControl { get; private set; }
     [field: NonSerialized] public ModFileResolver ModFiles { get; private set; }
     [field: NonSerialized] public LocalizationControl Localization { get; private set; }
+    [field: NonSerialized] public SceneModifier SceneModifier { get; private set; }
     // [field: NonSerialized] public ArenaWinsControl ArenaWins { get; private set; }
     // [field: NonSerialized] public GameVideoControl VideoControl { get; private set; }
 
@@ -36,6 +37,8 @@ public sealed class ModComponent : MonoBehaviour
             ModFiles = new ModFileResolver();
             Localization = new LocalizationControl();
 
+            SceneModifier = SceneModifier.Initialize();
+
             Log.LogMessage($"[{nameof(ModComponent)}].{nameof(Awake)}(): Processed successfully.");
         }
         catch (Exception ex)
@@ -45,7 +48,7 @@ public sealed class ModComponent : MonoBehaviour
             throw;
         }
     }
-    
+
     public void OnDestroy()
     {
         Log.LogInfo($"[{nameof(ModComponent)}].{nameof(OnDestroy)}()");
