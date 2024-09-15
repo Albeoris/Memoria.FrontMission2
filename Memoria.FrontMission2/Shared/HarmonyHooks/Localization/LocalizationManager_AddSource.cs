@@ -83,8 +83,8 @@ public static class LocalizationManager_AddSource
 
     private static void ModifyInternal(Int32 languageIndex, IReadOnlyList<String> files, LanguageSourceData sourceData)
     {
-        Dictionary<String, TransifexEntry> entries = new Dictionary<String, TransifexEntry>();
-        Dictionary<String, TransifexEntry> tags = new Dictionary<String, TransifexEntry>();
+        Dictionary<String, TransifexEntry> entries = new();
+        Dictionary<String, TransifexEntry> tags = new();
 
         foreach (IGrouping<String, String> filesInFolder in files.GroupBy(Path.GetDirectoryName))
         {
@@ -163,7 +163,7 @@ public static class LocalizationManager_AddSource
     private static void ApplyEntries(Dictionary<String, TransifexEntry> entries, Int32 languageIndex, LanguageSourceData sourceData)
     {
         Int32 changed = 0;
-        Int32 skipped = 0;
+        Int32 added = 0;
         foreach ((String key, TransifexEntry value) in entries)
         {
             TermData termData = sourceData.GetTermData(key);
@@ -174,12 +174,12 @@ public static class LocalizationManager_AddSource
             }
             else
             {
-                // info = new LocalizedMessages.MessageInfo { m_Value = value.Text };
-                // messageInfos.Add(key, info);
-                skipped++;
+                termData = sourceData.AddTerm(key);
+                termData.SetTranslation(languageIndex, value.Text);
+                added++;
             }
         }
 
-        ModComponent.Log.LogMessage($"[{nameof(LocalizationManager_AddSource)}] Applied: {entries.Count} localized files. Changed: {changed}, Skipped: {skipped}");
+        ModComponent.Log.LogMessage($"[{nameof(LocalizationManager_AddSource)}] Applied: {entries.Count} localized files. Changed: {changed}, Added: {added}");
     }
 }
