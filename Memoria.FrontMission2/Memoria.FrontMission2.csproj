@@ -160,6 +160,10 @@
                 <HintPath>$(FrameworkPathOverride)\AstarPathfindingProject.dll</HintPath>
                 <Private>False</Private>
             </Reference>
+            <Reference Include="Sirenix.Serialization">
+                <HintPath>$(FrameworkPathOverride)\Sirenix.Serialization.dll</HintPath>
+                <Private>False</Private>
+            </Reference>
         </ItemGroup>
 
         <ItemGroup>

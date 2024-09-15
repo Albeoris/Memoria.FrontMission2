@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace Memoria.FrontMission2.Shared.Framework.UIChanger;
 
-public sealed class StretchableObjectMaker
+public static class StretchableGarageSmallScroll
 {
     public static Boolean TryMakeStretchable(GameObject obj, out IStretchableObject stretchableObject, out FormattableString reason)
     {
@@ -21,7 +21,7 @@ public sealed class StretchableObjectMaker
 		
         if (!SmallScroll.TryCreate(rectTransform, out SmallScroll smallScroll, out reason))
         {
-            reason = $"Failed to create SmallScroll for the specified RectTransform. Reason: {reason}";
+            reason = $"Failed to create {nameof(SmallScroll)} for the specified RectTransform. Reason: {reason}";
             return false;
         }
 
@@ -37,14 +37,16 @@ public sealed class StretchableObjectMaker
 		
         private readonly FrameBackground _frameBackground;
         private readonly BlackBackground _blackBackground;
+        private readonly Header _header;
         private readonly ScrollView _scrollView;
 
-        public SmallScroll(RectTransform rectTransform, FrameBackground frameBackground, BlackBackground blackBackground, ScrollView scrollView)
+        public SmallScroll(RectTransform rectTransform, FrameBackground frameBackground, BlackBackground blackBackground, Header header, ScrollView scrollView)
         {
             RectTransform = rectTransform;
 			
             _frameBackground = frameBackground;
             _blackBackground = blackBackground;
+            _header = header;
             _scrollView = scrollView;
         }
 
@@ -52,6 +54,7 @@ public sealed class StretchableObjectMaker
         {
             _frameBackground.MakeStretchable();
             _blackBackground.MakeStretchable();
+            _header.MakeStretchable();
             _scrollView.MakeStretchable();
         }
 
@@ -60,17 +63,24 @@ public sealed class StretchableObjectMaker
             result = null;
             
             Int32 childCount = rectTransform.childCount;
-            if (childCount < 4)
+            const Int32 expectedCount = 4;
+            if (childCount < expectedCount)
             {
-                reason = $"The RectTransform must have at least 4 children to be stretchable, but the GameObject [{rectTransform.name}] has {childCount}.";
+                reason = $"The RectTransform must have at least {expectedCount} children to be stretchable, but the GameObject [{rectTransform.name}] has {childCount}.";
                 return false;
             }
 
-            IReadOnlyDictionary<String, Transform> childrenByName = rectTransform.EnumerateChildren().ToDictionary(c => c.name);
+            IReadOnlyDictionary<String, RectTransform> childrenByName = rectTransform.GetChildrenByName();
 
             if (!FrameBackground.TryCreate(childrenByName, out FrameBackground frameBackground, out reason))
             {
                 reason = $"Failed to create FrameBackground for the specified RectTransform. Reason: {reason}";
+                return false;
+            }
+            
+            if (!Header.TryCreate(childrenByName, out Header header, out reason))
+            {
+                reason = $"Failed to create Header for the specified RectTransform. Reason: {reason}";
                 return false;
             }
 			
@@ -86,7 +96,7 @@ public sealed class StretchableObjectMaker
                 return false;
             }
 
-            result = new SmallScroll(rectTransform, frameBackground, blackBackground, scrollView);
+            result = new SmallScroll(rectTransform, frameBackground, blackBackground, header, scrollView);
             return true;
         }
 
@@ -107,23 +117,17 @@ public sealed class StretchableObjectMaker
                 _rectTransform.SetAnchors(AnchorPreset.StretchAll, keepCurrentRect: true);
             }
 
-            public static Boolean TryCreate(IReadOnlyDictionary<String, Transform> objects, out FrameBackground result, out FormattableString reason)
+            public static Boolean TryCreate(IReadOnlyDictionary<String, RectTransform> objects, out FrameBackground result, out FormattableString reason)
             {
                 result = null;
 
-                if (!objects.TryGetValue("FrameBackground", out Transform frameBackgroundTransform))
+                if (!objects.TryGetValue("FrameBackground", out RectTransform frameBackgroundTransform))
                 {
                     reason = $"Cannot find object by name [FrameBackground].";
                     return false;
                 }
 
-                if (frameBackgroundTransform is not RectTransform frameBackgroundRectTransform)
-                {
-                    reason = $"The GameObject [{frameBackgroundTransform.name}] does not have a RectTransform component.";
-                    return false;
-                }
-
-                GameObject frameBackground = frameBackgroundRectTransform.gameObject;
+                GameObject frameBackground = frameBackgroundTransform.gameObject;
                 Image frameBackgroundImage = frameBackground.GetComponent<Image>();
                 if (frameBackgroundImage is null)
                 {
@@ -157,7 +161,7 @@ public sealed class StretchableObjectMaker
                     return false;
                 }
 
-                result = new FrameBackground(frameBackgroundRectTransform, frameBackgroundImage);
+                result = new FrameBackground(frameBackgroundTransform, frameBackgroundImage);
                 reason = null;
                 return true;
             }
@@ -177,19 +181,13 @@ public sealed class StretchableObjectMaker
                 _rectTransform.SetAnchors(AnchorPreset.StretchAll, keepCurrentRect: true);
             }
 
-            public static Boolean TryCreate(IReadOnlyDictionary<String, Transform> objects, out BlackBackground result, out FormattableString reason)
+            public static Boolean TryCreate(IReadOnlyDictionary<String, RectTransform> objects, out BlackBackground result, out FormattableString reason)
             {
                 result = null;
 
-                if (!objects.TryGetValue("BlackBackground", out Transform blackBackgroundTransform))
+                if (!objects.TryGetValue("BlackBackground", out RectTransform blackBackgroundTransformRectTransform))
                 {
                     reason = $"Cannot find object by name [BlackBackground].";
-                    return false;
-                }
-
-                if (blackBackgroundTransform is not RectTransform blackBackgroundTransformRectTransform)
-                {
-                    reason = $"The GameObject [{blackBackgroundTransform.name}] does not have a RectTransform component.";
                     return false;
                 }
 
@@ -212,6 +210,36 @@ public sealed class StretchableObjectMaker
                 return true;
             }
         }
+        
+        public sealed class Header
+        {
+            private readonly RectTransform _rectTransform;
+
+            public Header(RectTransform rectTransform)
+            {
+                _rectTransform = rectTransform;
+            }
+
+            public void MakeStretchable()
+            {
+                _rectTransform.SetAnchors(AnchorPreset.TopCenter, keepCurrentRect: true);
+            }
+
+            public static Boolean TryCreate(IReadOnlyDictionary<String, RectTransform> objects, out Header result, out FormattableString reason)
+            {
+                result = null;
+
+                if (!objects.TryGetValue("Header", out RectTransform headerTransform))
+                {
+                    reason = $"Cannot find object by name [Header].";
+                    return false;
+                }
+
+                result = new Header(headerTransform);
+                reason = null;
+                return true;
+            }
+        }
 		
         public sealed class ScrollView
         {
@@ -230,19 +258,13 @@ public sealed class StretchableObjectMaker
                 _scrollbarVertical.MakeStretchable();
             }
             
-            public static Boolean TryCreate(IReadOnlyDictionary<String, Transform> objects, out ScrollView result, out FormattableString reason)
+            public static Boolean TryCreate(IReadOnlyDictionary<String, RectTransform> objects, out ScrollView result, out FormattableString reason)
             {
                 result = null;
 
-                if (!objects.TryGetValue("Scroll View", out Transform scrollViewTransform))
+                if (!objects.TryGetValue("Scroll View", out RectTransform scrollViewRectTransform))
                 {
                     reason = $"Cannot find object by name [Scroll View].";
-                    return false;
-                }
-
-                if (scrollViewTransform is not RectTransform scrollViewRectTransform)
-                {
-                    reason = $"The GameObject [{scrollViewTransform.name}] does not have a RectTransform component.";
                     return false;
                 }
 

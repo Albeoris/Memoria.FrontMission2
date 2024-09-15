@@ -135,4 +135,18 @@ public static class AnchorPresets
                 throw new ArgumentOutOfRangeException(nameof(preset), preset, $"The specified AnchorPreset [{preset}] is not supported.");
         }
     }
+
+    public static void ResizeAndMoveParentToChild(RectTransform childRectTransform)
+    {
+        RectTransform parentRectTransform = (RectTransform)childRectTransform.parent;
+
+        Vector3 positionDelta = childRectTransform.localPosition;
+        Vector2 sizeDelta = childRectTransform.sizeDelta;
+        
+        childRectTransform.offsetMin = Vector2.zero;
+        childRectTransform.offsetMax = Vector2.zero;
+        
+        parentRectTransform.localPosition += positionDelta;
+        parentRectTransform.sizeDelta += sizeDelta;
+    }
 }

@@ -27,7 +27,7 @@ internal static class ExtensionMethodsGameObject
         if (parent is null) throw new ArgumentNullException(nameof(parent));
         if (name is null) throw new ArgumentNullException(nameof(name));
 
-        return parent.EnumerateChildren().FirstOrDefault(obj => obj.name == name);
+        return parent.transform.FindChildByName(name)?.gameObject;
     }
     
     [NotNull]
@@ -36,14 +36,7 @@ internal static class ExtensionMethodsGameObject
         if (parent is null) throw new ArgumentNullException(nameof(parent));
         if (name is null) throw new ArgumentNullException(nameof(name));
 
-        GameObject child = parent.FindChildByName(name);
-        if (child is not null)
-            return child;
-
-        StringBuilder sb = new StringBuilder();
-        sb.AppendLine($"Cannot find child with name [{name}] for the object {parent.name} ({parent.GetInstanceID()}).");
-        sb.AppendLine("Existing children: " + String.Join(", ", parent.EnumerateChildren().Select(c => c.name)));
-        throw new ArgumentException(sb.ToString());
+        return parent.transform.GetChildByName(name).gameObject;
     }
 
     public static T GetExactComponent<T>(this GameObject obj) where T : Component
@@ -71,6 +64,22 @@ internal static class ExtensionMethodsGameObject
     public static T[] GetExactComponents<T>(this GameObject obj) where T : Component
     {
         return obj.GetComponents<T>().Where(c => c.GetType() == TypeCache<T>.Type).ToArray();
+    }
+
+    public static T EnsureComponent<T>(this GameObject obj) where T : Component
+    {
+        return obj.GetComponent<T>() ?? obj.AddComponent<T>();
+    }
+    
+    public static T EnsureComponent<T>(this GameObject obj, Boolean initialEnabled) where T : MonoBehaviour
+    {
+        var component = obj.GetComponent<T>();
+        if (component is not null)
+            return component;
+        
+        component = obj.AddComponent<T>();
+        component.enabled = initialEnabled;
+        return component;
     }
 
     public static T EnsureExactComponent<T>(this GameObject obj) where T : Component

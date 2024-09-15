@@ -10,6 +10,7 @@ public sealed partial class ModConfiguration
     public AssetsConfiguration Assets { get; }
     public ArenaConfiguration Arena { get; }
     public BattlefieldConfiguration Battlefield { get; }
+    public UIConfiguration UI { get; }
     public LocalizationConfiguration Localization { get; }
     public CheatsConfiguration Cheats { get; }
     public DebugConfiguration Debug { get; }
@@ -29,6 +30,7 @@ public sealed partial class ModConfiguration
                 Assets = AssetsConfiguration.Create(_provider);
                 Arena = ArenaConfiguration.Create(_provider);
                 Battlefield = BattlefieldConfiguration.Create(_provider);
+                UI = UIConfiguration.Create(_provider);
                 Localization = LocalizationConfiguration.Create(_provider);
                 Cheats = CheatsConfiguration.Create(_provider);
                 Debug = DebugConfiguration.Create(_provider);
@@ -71,6 +73,7 @@ public sealed partial class ModConfiguration
                     Assets.OverrideFrom(AssetsConfiguration.Create(provider));
                     Arena.OverrideFrom(ArenaConfiguration.Create(provider));
                     Battlefield.OverrideFrom(BattlefieldConfiguration.Create(provider));
+                    UI.OverrideFrom(UIConfiguration.Create(provider));
                     Localization.OverrideFrom(LocalizationConfiguration.Create(provider));
                     Debug.OverrideFrom(DebugConfiguration.Create(provider));
                 }

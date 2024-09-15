@@ -29,6 +29,10 @@ public sealed class GarageSceneModifier : ISceneModifier
 
     private void StretchPaintWanzerPanel(GameObject garageCanvas)
     {
+        Single desiredHeight = ModComponent.Instance.Config.UI.GaragePaintWanzerPanelHeight;
+        if (desiredHeight < 1)
+            return;
+        
         GameObject panel = garageCanvas.FindChildByName("PaintWanzerPanel");
         if (panel is null)
         {
@@ -36,20 +40,26 @@ public sealed class GarageSceneModifier : ISceneModifier
             return;
         }
 
-        if (!StretchableObjectMaker.TryMakeStretchable(panel, out IStretchableObject stretchableObject, out FormattableString reason))
+        if (!StretchableGarageSmallScroll.TryMakeStretchable(panel, out IStretchableObject stretchableObject, out FormattableString reason))
         {
             ModComponent.Log.LogError($"[{nameof(ModComponent)}].{nameof(OnSceneLoaded)}(): Cannot stretch [{panel.name}] inside [{garageCanvas.name}]. Reason: {reason}");
             return;
         }
 
         Vector2 oldSize = stretchableObject.RectTransform.sizeDelta;
-        Vector2 newSize = oldSize with { y = 540 };
+        desiredHeight = desiredHeight > 0 ? desiredHeight : oldSize.y;
+
+        Vector2 newSize = oldSize with { y = desiredHeight };
         stretchableObject.RectTransform.sizeDelta = newSize;
         ModComponent.Log.LogInfo($"[{stretchableObject.RectTransform.name}] has been stretched {oldSize} -> {newSize}.");
     }
 
     private void StretchChooseWanzerPanel(GameObject garageCanvas)
     {
+        Single desiredHeight = ModComponent.Instance.Config.UI.GarageChooseWanzerPanelHeight;
+        if (desiredHeight < 1)
+            return;
+        
         GameObject panel = garageCanvas.FindChildByName("ChooseWanzerPanel");
         if (panel is null)
         {
@@ -57,20 +67,27 @@ public sealed class GarageSceneModifier : ISceneModifier
             return;
         }
 
-        if (!StretchableObjectMaker.TryMakeStretchable(panel, out IStretchableObject stretchableObject, out FormattableString reason))
+        if (!StretchableGarageSmallScroll.TryMakeStretchable(panel, out IStretchableObject stretchableObject, out FormattableString reason))
         {
             ModComponent.Log.LogError($"[{nameof(ModComponent)}].{nameof(OnSceneLoaded)}(): Cannot stretch [{panel.name}] inside [{garageCanvas.name}]. Reason: {reason}");
             return;
         }
 
         Vector2 oldSize = stretchableObject.RectTransform.sizeDelta;
-        Vector2 newSize = oldSize with { y = 300 };
+        desiredHeight = desiredHeight > 0 ? desiredHeight : oldSize.y;
+
+        Vector2 newSize = oldSize with { y = desiredHeight };
         stretchableObject.RectTransform.sizeDelta = newSize;
         ModComponent.Log.LogInfo($"[{stretchableObject.RectTransform.name}] has been stretched {oldSize} -> {newSize}.");
     }
 
     private void StretchEquipWeaponPanel(GameObject garageCanvas)
     {
+        Single desiredWith = ModComponent.Instance.Config.UI.GarageEquipWeaponPanelWidth;
+        Single desiredHeight = ModComponent.Instance.Config.UI.GarageEquipWeaponPanelHeight;
+        if (desiredWith < 1 && desiredHeight < 1)
+            return;
+        
         GameObject equipWeaponPanel = garageCanvas.FindChildByName("EquipWeaponPanel");
         if (equipWeaponPanel is null)
         {
@@ -85,24 +102,44 @@ public sealed class GarageSceneModifier : ISceneModifier
             return;
         }
 
-        if (!StretchableObjectMaker.TryMakeStretchable(equipWeaponPanel, out IStretchableObject stretchableObject, out FormattableString reason))
+        if (!StretchableGarageSmallScroll.TryMakeStretchable(equipWeaponPanel, out IStretchableObject stretchableObject, out FormattableString reason))
         {
             ModComponent.Log.LogError($"[{nameof(ModComponent)}].{nameof(OnSceneLoaded)}(): Cannot stretch [{equipWeaponPanel.name}] inside [{garageCanvas.name}]. Reason: {reason}");
             return;
         }
 
         Vector2 oldSize = stretchableObject.RectTransform.sizeDelta;
-        Vector2 newSize = oldSize with { y = 600 };
+        desiredWith = desiredWith > 0 ? desiredWith : oldSize.x;
+        desiredHeight = desiredHeight > 0 ? desiredHeight : oldSize.y;
+
+        Vector2 newSize = new Vector2(x: desiredWith, y: desiredHeight);
         stretchableObject.RectTransform.sizeDelta = newSize;
         ModComponent.Log.LogInfo($"[{stretchableObject.RectTransform.name}] has been stretched {oldSize} -> {newSize}.");
         
         // Move WeaponInfoPanel to right
+        Single oxDelta = desiredWith - 150;
         Transform weaponInfoTransform = weaponInfoPanel.transform;
-        weaponInfoTransform.localPosition = new Vector2(-400, 340);
+        weaponInfoTransform.localPosition = new Vector2(-350 + oxDelta, 340);
+        
+        RectTransform weaponStartsTransform = weaponInfoPanel.FindChildByName("WeaponStats")?.transform as RectTransform;
+        if (weaponStartsTransform is null)
+        {
+            ModComponent.Log.LogError($"Cannot find WeaponStats to change its width.");
+        }
+        else
+        {
+            weaponStartsTransform.sizeDelta = weaponStartsTransform.sizeDelta with { x = 50 };
+            weaponInfoTransform.localPosition = new Vector2(-325 + oxDelta, 340);
+        }
     }
     
     private void StretchEquipPartPanel(GameObject garageCanvas)
     {
+        Single desiredWith = ModComponent.Instance.Config.UI.GarageEquipPartPanelWidth;
+        Single desiredHeight = ModComponent.Instance.Config.UI.GarageEquipPartPanelHeight;
+        if (desiredWith < 1 && desiredHeight < 1)
+            return;
+        
         GameObject equipPartPanel = garageCanvas.FindChildByName("EquipPartPanel");
         if (equipPartPanel is null)
         {
@@ -116,20 +153,31 @@ public sealed class GarageSceneModifier : ISceneModifier
             ModComponent.Log.LogError($"[{nameof(ModComponent)}].{nameof(OnSceneLoaded)}(): Cannot find [PartInfoPanel] inside [{garageCanvas.name}].");
             return;
         }
-
-        if (!StretchableObjectMaker.TryMakeStretchable(equipPartPanel, out IStretchableObject stretchableObject, out FormattableString reason))
+        
+        if (!StretchableGarageSmallScroll.TryMakeStretchable(equipPartPanel, out IStretchableObject stretchableEquipPanel, out FormattableString reason))
         {
             ModComponent.Log.LogError($"[{nameof(ModComponent)}].{nameof(OnSceneLoaded)}(): Cannot stretch [{equipPartPanel.name}] inside [{garageCanvas.name}]. Reason: {reason}");
             return;
         }
+        
+        if (!StretchableGaragePartInfoPanel.TryMakeStretchable(partInfoPanel, out IStretchableObject stretchableInfoPanel, out reason))
+        {
+            ModComponent.Log.LogError($"[{nameof(ModComponent)}].{nameof(OnSceneLoaded)}(): Cannot stretch [{partInfoPanel.name}] inside [{garageCanvas.name}]. Reason: {reason}");
+            return;
+        }
 
-        Vector2 oldSize = stretchableObject.RectTransform.sizeDelta;
-        Vector2 newSize = oldSize with { y = 600 };
-        stretchableObject.RectTransform.sizeDelta = newSize;
-        ModComponent.Log.LogInfo($"[{stretchableObject.RectTransform.name}] has been stretched {oldSize} -> {newSize}.");
+        Vector2 oldSize = stretchableEquipPanel.RectTransform.sizeDelta;
+        desiredWith = desiredWith > 0 ? desiredWith : oldSize.x;
+        desiredHeight = desiredHeight > 0 ? desiredHeight : oldSize.y;
+
+        Vector2 newSize = new Vector2(x: desiredWith, y: desiredHeight);
+        stretchableEquipPanel.RectTransform.sizeDelta = newSize;
+        ModComponent.Log.LogInfo($"[{stretchableEquipPanel.RectTransform.name}] has been stretched {oldSize} -> {newSize}.");
         
         // Move PartInfoPanel to right
-        Transform partInfoTransform = partInfoPanel.transform;
-        partInfoTransform.localPosition = new Vector2(-270, 270);
+        Single oxDelta = desiredWith - 150;
+        RectTransform partInfoTransform = stretchableInfoPanel.RectTransform;
+        partInfoTransform.localPosition = new Vector2(-510 + oxDelta, 487);
+        partInfoTransform.sizeDelta = partInfoTransform.sizeDelta with { x = 460 };
     }
 }
