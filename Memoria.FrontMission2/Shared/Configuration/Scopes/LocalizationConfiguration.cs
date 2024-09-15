@@ -20,6 +20,10 @@ public abstract partial class LocalizationConfiguration
     [ConfigEntry("Reduces the black outline of labels such as AP in combat to improve the appearance of Unicode characters." +
                  "$[Russian]: Уменьшает чёрную обводку надписей, таких как AP в бою, для улучшения внешнего вида юникодных символов.")]
     public virtual Boolean ReduceBlackOutlines => false;
+    
+    [ConfigEntry("Enables localization even if it is disabled by the developers." +
+                 "$[Russian]: Включает локализацию даже в том случае, если она отключена разработчиками.")]
+    public virtual Boolean ForceLocalization => false;
 
     public abstract void CopyFrom(LocalizationConfiguration configuration);
     public abstract void OverrideFrom(LocalizationConfiguration configuration);
