@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using BepInEx.Configuration;
 using BepInEx.Logging;
@@ -13,6 +15,8 @@ namespace Memoria.FrontMission2.HarmonyHooks;
 public static class ConfigEntryBase_SetSerializedValue
 {
     public static ManualLogSource Log { get; set; }
+
+    public static readonly MethodInfo OrphanedEntriesGetter = AccessTools.PropertyGetter(typeof(ConfigFile), "OrphanedEntries");
 
     public static void Patch(Harmony harmony, ManualLogSource log)
     {
@@ -35,6 +39,10 @@ public static class ConfigEntryBase_SetSerializedValue
     
     public static void SetSerializedValuePostfix(ConfigEntryBase __instance)
     {
+        Dictionary<ConfigDefinition, String> orphanedEntries = (Dictionary<ConfigDefinition, String>)OrphanedEntriesGetter.Invoke(__instance.ConfigFile, null);
+        if (!orphanedEntries.ContainsKey(__instance.Definition))
+            return;
+        
         MemoriaConfigDescription extendedConfig = (MemoriaConfigDescription)__instance.Description;
         extendedConfig.HasFileDefinedValue = true;
     }

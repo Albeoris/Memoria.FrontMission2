@@ -171,10 +171,11 @@ internal static class ConfigurationScopeEmitter
         AppendLine(String.Empty);
         AppendLine($"public override void OverrideFrom({descriptor.TypeName} other)");
         AppendLine("{");
+        AppendLine($"{descriptor.ImplementationTypeName} otherImpl = ({descriptor.ImplementationTypeName})other;");
         foreach (ConfigurationEntryDescriptor property in descriptor.Properties)
         {
             if (property.ConverterInstance is null)
-                AppendLine($"if ({property.BackingFieldName}.HasFileDefinedValue()) {property.OverrideName} = other.{property.Name};");
+                AppendLine($"if (otherImpl.{property.BackingFieldName}.HasFileDefinedValue()) {property.OverrideName} = other.{property.Name};");
         }
         AppendLine("}");
 
