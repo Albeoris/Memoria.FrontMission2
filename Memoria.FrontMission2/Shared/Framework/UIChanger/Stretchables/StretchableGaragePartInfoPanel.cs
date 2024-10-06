@@ -47,7 +47,8 @@ public static class StretchableGaragePartInfoPanel
                 container.MakeStretchable();
 
             RectTransform.SetPivot(PivotPreset.TopLeft, keepCurrentRect: true);
-            AnchorPresets.ResizeAndMoveParentToChild(_statsContainer.First().RectTransform);
+            foreach (StatsContainer container in _statsContainer)
+                AnchorPresets.ResizeAndMoveParentToChild(container.RectTransform);   
         }
 
         public static Boolean TryCreate(RectTransform rectTransform, out Root result, out FormattableString reason)
